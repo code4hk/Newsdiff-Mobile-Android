@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Newsdiff HK</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="empty">下載中...</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
+</resources>
