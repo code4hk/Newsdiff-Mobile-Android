@@ -22,7 +22,7 @@ import hk.code4.newsdiffhk.BuildConfig;
  * Created by allen517 on 17/6/15.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.KITKAT, manifest = "src/main/AndroidManifest.xml")
+@Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.KITKAT)
 public class TestPublisher {
 
     String json = "[{\"code\": \"tvb\", \"name\": \"\\u7121\\u7dab\\u65b0\\u805e\"}, {\"code\": \"singtao\", \"name\": \"\\u661f\\u5cf6\\u65e5\\u805e\"}, {\"code\": \"apple\", \"name\": \"\\u860b\\u679c\\u65e5\\u5831\"}]";
