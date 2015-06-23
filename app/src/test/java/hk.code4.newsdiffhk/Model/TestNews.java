@@ -62,7 +62,6 @@ public class TestNews {
     @Test
     public void testGson() throws Exception {
         Gson gson = new Gson();
-//        Type collectionType = new TypeToken<List<News>>(){}.getType();
         News lcs = gson.fromJson(json, News.class);
 
         assertEquals(20, lcs.getMeta().getCount());

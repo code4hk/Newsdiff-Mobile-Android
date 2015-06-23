@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by allen517 on 22/6/15.
@@ -33,5 +34,6 @@ public class TestNewsDiff {
         assertEquals("外籍男爬野長城蕩失路 被困2日缺糧水", data.getTitle());
         assertEquals("apple", data.getPublisher());
         assertEquals("zh_Hant", data.getLang());
+        assertTrue(0.9195266272189349 == data.getChanges());
     }
 }
