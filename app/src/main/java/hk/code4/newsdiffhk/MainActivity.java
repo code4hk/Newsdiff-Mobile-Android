@@ -5,12 +5,16 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.List;
 
+import hk.code4.newsdiffhk.Adapter.NewsAdapter;
 import hk.code4.newsdiffhk.DAO.NetworkController;
 import hk.code4.newsdiffhk.Model.News;
 import hk.code4.newsdiffhk.Model.Publisher;
@@ -44,6 +48,9 @@ public class MainActivity  extends AppCompatActivity {
 
     List<Publisher> mPublishers;
     TabLayout mTabLayout;
+    NewsAdapter mAdapter;
+    RecyclerView mRecyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +70,45 @@ public class MainActivity  extends AppCompatActivity {
 //        mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         mTabLayout.addTab(mTabLayout.newTab().setText("ALL"));
+        mTabLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0)
+                    mAdapter.flushFilter();
+                else
+                    mAdapter.setFilter(mPublishers.get(tab.getPosition()-1).getCode());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         mNetworkController = NetworkController.getInstance();
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new NewsAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
         new Thread(new Runnable() {
             @Override
@@ -92,6 +136,8 @@ public class MainActivity  extends AppCompatActivity {
                 .flatMap(new Func1<List<Publisher>, Observable<Publisher>>() {
                     @Override
                     public Observable<Publisher> call(List<Publisher> list) {
+                        mPublishers = list;
+                        mAdapter.setPublisher(list);
                         return Observable.from(list);
                     }
                 })
@@ -128,6 +174,8 @@ public class MainActivity  extends AppCompatActivity {
                 .subscribe(new Subscriber<News>() {
                     @Override
                     public void onNext(News news) {
+                        mAdapter.setData(news);
+                        mAdapter.notifyDataSetChanged();
                         System.out.println(news.getMeta().getCount());
                     }
 
@@ -230,7 +278,7 @@ public class MainActivity  extends AppCompatActivity {
 //        @Override
 //        public View onCreateView(LayoutInflater inflater, ViewGroup container,
 //                                 Bundle savedInstanceState) {
-//            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+//            View rootView = inflater.inflate(R.layout.news_list_row, container, false);
 //            return rootView;
 //        }
 //    }
