@@ -113,19 +113,12 @@ public class MainActivity  extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                getPublisher();
+                getData();
             }
         }, "Get-all-publisher").start();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                getAllNews();
-            }
-        }, "Get-all-news").start();
     }
 
-    private void getPublisher() {
+    private void getData() {
         Observable.just(mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL))
                 .map(new Func1<String, List<Publisher>>() {
                     @Override
@@ -159,9 +152,6 @@ public class MainActivity  extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 });
-    }
-
-    private void getAllNews(){
         Observable.just(mNetworkController.getJson(NetworkController.ALL_NEWS_URL))
                 .map(new Func1<String, News>() {
                     @Override

@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/section_label"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/primary_dark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,6 +36,7 @@
         android:id="@+id/section_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:text="賈伯斯的美學風格，從他在校學習字體美術設計課程後就打下基礎，只是大家沒想到的是，他的美學除了用來設計Mac與iP" />
 
 </LinearLayout>
