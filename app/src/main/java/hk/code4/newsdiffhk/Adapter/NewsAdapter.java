@@ -43,7 +43,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     public void setData(News news){
         mDataset = news;
-        visibleObjects = mDataset.getNews();
+        visibleObjects.addAll(mDataset.getNews());
     }
 
     public void setPublisher(List<Publisher> publishers) {
@@ -99,8 +99,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        if (mDataset == null) return 0;
-        return mDataset.getNews().size();
+        if (visibleObjects == null) return 0;
+        return visibleObjects.size();
     }
     private List<NewsItem> visibleObjects = new ArrayList<>();
 
