@@ -1,6 +1,7 @@
 package hk.code4.newsdiffhk;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import hk.code4.newsdiffhk.Adapter.NewsAdapter;
 import hk.code4.newsdiffhk.DAO.NetworkController;
 import hk.code4.newsdiffhk.Model.News;
 import hk.code4.newsdiffhk.Model.Publisher;
+import hk.code4.newsdiffhk.Util.NetworkUtils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -26,7 +29,7 @@ import rx.schedulers.Schedulers;
 /**
  * Layout for the photo list view header.
  */
-public class MainActivity  extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -48,6 +51,8 @@ public class MainActivity  extends AppCompatActivity {
     TabLayout mTabLayout;
     NewsAdapter mAdapter;
     RecyclerView mRecyclerView;
+    private boolean loading = true;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,55 +108,36 @@ public class MainActivity  extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear activity_main manager
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        final LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new NewsAdapter();
         mRecyclerView.setAdapter(mAdapter);
-
-        new Thread(new Runnable() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void run() {
-                getData();
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                visibleItemCount = mLayoutManager.getChildCount();
+                totalItemCount = mLayoutManager.getItemCount();
+                pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                if (loading) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        loading = false;
+                        Log.v("...", "Last Item Wow !");
+                    }
+                }
             }
-        }, "Get-all-publisher").start();
+        });
+        if (NetworkUtils.isOnline(MainActivity.this))
+            getData();
     }
 
-//    private Observable<List<Publisher>> getDatad() {
-//        return Observable.create(new Observable.OnSubscribe<List<Publisher>>() {
-//            @Override
-//            public Subscription call(Subscriber<? super List<Publisher>> subscriber) {
-//                mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL);
-//                return Subscriptions.empty();
-//            }
-//        });
-//    }
-//    private Observable<String> downloadFileObservable() {
-//        return Observable.create(new Observable.OnSubscribe<String>() {
-//            @Override
-//            public Subscription call(Subscriber<? super String> subscriber) {
-//                mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL);
-//                return Subscriptions.empty();
-//            }
-//        });
-//    }
-
     private void getData() {
-        Observable.just(mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL))
-                .map(new Func1<String, List<Publisher>>() {
-                    @Override
-                    public List<Publisher> call(String json) {
-                        return mNetworkController.getPublisher(json);
-                    }
-                })
-                .flatMap(new Func1<List<Publisher>, Observable<Publisher>>() {
-                    @Override
-                    public Observable<Publisher> call(List<Publisher> list) {
-                        mPublishers = list;
-                        mAdapter.setPublisher(list);
-                        return Observable.from(list);
-                    }
-                })
+
+        Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL)))
+                .map(mNetworkController::getPublisher)
                 .subscribeOn(Schedulers.io())
+                .flatMap(this::getPublisherObservable)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Publisher>() {
                     @Override
@@ -169,13 +155,9 @@ public class MainActivity  extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 });
-        Observable.just(mNetworkController.getJson(NetworkController.ALL_NEWS_URL))
-                .map(new Func1<String, News>() {
-                    @Override
-                    public News call(String json) {
-                        return mNetworkController.getNews(json);
-                    }
-                })
+
+        Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_NEWS_URL)))
+                .map(mNetworkController::getNews)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<News>() {
@@ -197,6 +179,14 @@ public class MainActivity  extends AppCompatActivity {
                     }
                 });
     }
+
+    @NonNull
+    private Observable<Publisher> getPublisherObservable(List<Publisher> list) {
+        mPublishers = list;
+        mAdapter.setPublisher(list);
+        return Observable.from(list);
+    }
+
 
     private void setUpToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
