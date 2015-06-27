@@ -1,5 +1,7 @@
 package hk.code4.newsdiffhk.Adapter;
 
+import android.content.Intent;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import hk.code4.newsdiffhk.MainActivity;
 import hk.code4.newsdiffhk.Model.News;
 import hk.code4.newsdiffhk.Model.NewsItem;
 import hk.code4.newsdiffhk.Model.Publisher;
@@ -18,14 +21,14 @@ import hk.code4.newsdiffhk.R;
 /**
  * Created by allen517 on 3/6/15.
  */
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     private News mDataset;
     List<Publisher> mPublishers;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
         public TextView section_create_date, section_update_date, section_label, section_changes, section_content;
         public ViewHolder(View v) {
@@ -35,7 +38,24 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             section_label = (TextView) v.findViewById(R.id.section_label);
             section_changes = (TextView) v.findViewById(R.id.section_changes);
             section_content = (TextView) v.findViewById(R.id.section_content);
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(v, getAdapterPosition());
+            }
+        }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    OnItemClickListener mItemClickListener;
+    public void setOnItemClickListener(final OnItemClickListener listener) {
+        this.mItemClickListener = listener;
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -65,22 +85,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.news_list_row, parent, false);
-        // set the view's size, margins, paddings and activity_main parameters
-        ViewHolder holder = new ViewHolder(v);
-//        holder.section_changes
-//        holder.section_label = (TextView) v.findViewById(R.id.section_label);
-//        android:id="@+id/section_create_date"
-//        android:id="@+id/section_changes"
-//        android:id="@+id/section_content"
-//        switch (type){
-//            case HEADER:
-//                return HeaderHolder.newInstance(viewGroup);
-//            case DIVIDER:
-//                return DividerHolder.newInstance(viewGroup);
-//            default:
-//                return FirstViewHolder.newInstance(viewGroup);
-//        }
-        return holder;
+        return new ViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the activity_main manager)

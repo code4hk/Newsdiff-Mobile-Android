@@ -1,11 +1,13 @@
 package hk.code4.newsdiffhk;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,10 +21,10 @@ import hk.code4.newsdiffhk.DAO.NetworkController;
 import hk.code4.newsdiffhk.Model.News;
 import hk.code4.newsdiffhk.Model.Publisher;
 import hk.code4.newsdiffhk.Util.NetworkUtils;
+import hk.code4.newsdiffhk.Widget.EmptyRecyclerView;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 
@@ -48,9 +50,11 @@ public class MainActivity extends AppCompatActivity {
     NetworkController mNetworkController;
 
     List<Publisher> mPublishers;
+    News mNews;
     TabLayout mTabLayout;
     NewsAdapter mAdapter;
-    RecyclerView mRecyclerView;
+    EmptyRecyclerView mRecyclerView;
+
     private boolean loading = true;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
 
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
         mNetworkController = NetworkController.getInstance();
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        mRecyclerView = (EmptyRecyclerView) findViewById(R.id.recyclerView);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the activity_main size of the RecyclerView
@@ -109,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
         // use a linear activity_main manager
         final LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new NewsAdapter();
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -128,16 +133,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mRecyclerView.setEmptyView(findViewById(R.id.emptyText));
+        mAdapter.setOnItemClickListener((view, position) -> {
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            intent.putExtra("oid", mNews.getNews().get(position).getId());
+            startActivity(intent);
+        });
+
         if (NetworkUtils.isOnline(MainActivity.this))
-            getData();
+            getAllPublisher();
     }
 
-    private void getData() {
+    private void getAllPublisher() {
 
         Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL)))
                 .map(mNetworkController::getPublisher)
+                .flatMap(list-> {
+                    mPublishers = list;
+                    mAdapter.setPublisher(list);
+                    return Observable.from(list);
+                })
                 .subscribeOn(Schedulers.io())
-                .flatMap(this::getPublisherObservable)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Publisher>() {
                     @Override
@@ -148,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCompleted() {
                         System.out.println("Completed!");
+                        getAllNews();
                     }
 
                     @Override
@@ -155,6 +173,9 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 });
+    }
+
+    private void getAllNews() {
 
         Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_NEWS_URL)))
                 .map(mNetworkController::getNews)
@@ -163,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Subscriber<News>() {
                     @Override
                     public void onNext(News news) {
+                        mNews = news;
                         mAdapter.setData(news);
                         mAdapter.notifyDataSetChanged();
                         System.out.println(news.getMeta().getCount());
@@ -180,13 +202,10 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    @NonNull
-    private Observable<Publisher> getPublisherObservable(List<Publisher> list) {
-        mPublishers = list;
-        mAdapter.setPublisher(list);
-        return Observable.from(list);
-    }
-
+//    <T> Observable.Transformer<T, T> applySchedulers() {
+//        return observable -> observable.subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread());
+//    }
 
     private void setUpToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -194,90 +213,4 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
-
-//    /**
-//     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-//     * one of the sections/tabs/pages.
-//     */
-//    public class SectionsPagerAdapter extends BaseAdapter {
-//
-//        public SectionsPagerAdapter(FragmentManager fm) {
-//            super(fm);
-//        }
-//
-//        @Override
-//        public Fragment getItem(int position) {
-//            // getItem is called to instantiate the fragment for the given page.
-//            // Return a PlaceholderFragment (defined as a static inner class below).
-//            return PlaceholderFragment.newInstance(position + 1);
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            // Show 3 total pages.
-//            return (mPublishers==null)?0:mPublishers.size();
-//        }
-//
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            return mPublishers.get(position).getName();
-//        }
-//    }
-//
-//    /**
-//     * A placeholder fragment containing a simple view.
-//     */
-//    public static class PlaceholderFragment extends Fragment {
-//        /**
-//         * The fragment argument representing the section number for this
-//         * fragment.
-//         */
-//        private static final String ARG_SECTION_NUMBER = "section_number";
-//
-//        /**
-//         * Returns a new instance of this fragment for the given section
-//         * number.
-//         */
-//        public static PlaceholderFragment newInstance(int sectionNumber) {
-//            PlaceholderFragment fragment = new PlaceholderFragment();
-//            Bundle args = new Bundle();
-//            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-//            fragment.setArguments(args);
-//            return fragment;
-//        }
-//
-//        public PlaceholderFragment() {
-//        }
-//
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState) {
-//            View rootView = inflater.inflate(R.activity_main.news_list_row, container, false);
-//            return rootView;
-//        }
-//    }
-
 }
