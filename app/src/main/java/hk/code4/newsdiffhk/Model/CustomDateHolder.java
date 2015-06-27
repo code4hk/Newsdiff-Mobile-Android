@@ -12,7 +12,7 @@ public class CustomDateHolder {
     private long date;
 
     public Date getDate() {
-        return new Date(date * 1000);
+        return new Date(date);
     }
 
     public long getLong() {
