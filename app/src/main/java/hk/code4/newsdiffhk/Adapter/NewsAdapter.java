@@ -27,10 +27,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView section_info, section_label, section_changes, section_content;
+        public TextView section_create_date, section_update_date, section_label, section_changes, section_content;
         public ViewHolder(View v) {
             super(v);
-            section_info = (TextView) v.findViewById(R.id.section_info);
+            section_create_date = (TextView) v.findViewById(R.id.section_create_date);
+            section_update_date = (TextView) v.findViewById(R.id.section_update_date);
             section_label = (TextView) v.findViewById(R.id.section_label);
             section_changes = (TextView) v.findViewById(R.id.section_changes);
             section_content = (TextView) v.findViewById(R.id.section_content);
@@ -58,17 +59,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         return code;
     }
 
-    // Create new views (invoked by the layout manager)
+    // Create new views (invoked by the activity_main manager)
     @Override
     public NewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.news_list_row, parent, false);
-        // set the view's size, margins, paddings and layout parameters
+        // set the view's size, margins, paddings and activity_main parameters
         ViewHolder holder = new ViewHolder(v);
 //        holder.section_changes
 //        holder.section_label = (TextView) v.findViewById(R.id.section_label);
-//        android:id="@+id/section_info"
+//        android:id="@+id/section_create_date"
 //        android:id="@+id/section_changes"
 //        android:id="@+id/section_content"
 //        switch (type){
@@ -82,7 +83,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         return holder;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    // Replace the contents of a view (invoked by the activity_main manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
@@ -92,11 +93,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         NewsItem item = visibleObjects.get(position);
         if (item == null) return;
         holder.section_label.setText(item.getTitle());
-        holder.section_info.setText(""+item.getUpdatedAt());
-        holder.section_changes.setText(findPublisherName(item.getPublisher()) + " / " + MessageFormat.format("{0,number,#.##%}", item.getChanges()));
+        holder.section_create_date.setText("" + item.getCreatedAt());
+        holder.section_update_date.setText("" + item.getUpdatedAt());
+        StringBuilder sb = new StringBuilder(findPublisherName(item.getPublisher()));
+        sb.append(" / ");
+        sb.append(MessageFormat.format("{0,number,#.##%}", item.getChanges()));
+        sb.append("改動");
+        holder.section_changes.setText(sb.toString());
 //        holder.section_content.setText(item.getTitle());
     }
-    // Return the size of your dataset (invoked by the layout manager)
+    // Return the size of your dataset (invoked by the activity_main manager)
     @Override
     public int getItemCount() {
         if (visibleObjects == null) return 0;

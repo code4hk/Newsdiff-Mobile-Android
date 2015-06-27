@@ -10,27 +10,34 @@
 
     <TextView
         android:id="@+id/section_label"
-        style="@style/TextAppearance.AppCompat.Medium"
+        style="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/primary_dark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="賈伯斯家盤子 長得像iPhone備忘錄" />
 
     <TextView
-        android:id="@+id/section_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="文滙報   /   副刊   /   1次修改   /   40%改動" />
-
-    <TextView
         android:id="@+id/section_changes"
         style="@style/TextAppearance.AppCompat.Small"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:text="笫二次修改 - 亮點  NOV 23 ‘14 12:45" />
+
+    <TextView
+        android:id="@+id/section_update_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="文滙報   /   副刊   /   1次修改   /   40%改動" />
+
+    <TextView
+        android:id="@+id/section_create_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="文滙報   /   副刊   /   1次修改   /   40%改動" />
 
     <TextView
         android:id="@+id/section_content"
