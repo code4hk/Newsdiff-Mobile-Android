@@ -24,7 +24,7 @@ public class TestDataManager {
     @Before
     public void setUp() throws Exception {
         mNetworkController = NetworkController.getInstance();
-        mNetworkController.getAllNews();
+//        mNetworkController.getAllNews();
     }
 
     @Test
