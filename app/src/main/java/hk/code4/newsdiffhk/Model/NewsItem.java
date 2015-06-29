@@ -10,7 +10,7 @@ import java.util.Date;
 public class NewsItem {
     String publisher, url;
     CustomDateHolder created_at;
-    int comments_no;
+    int count, comments_no;
     CustomDateHolder updated_at;
     CustomOidHolder _id;
     double changes;
@@ -27,6 +27,10 @@ public class NewsItem {
 
     public Date getCreatedAt() {
         return created_at.getDate();
+    }
+
+    public int getCount() {
+        return count;
     }
 
     public int getCommentsNo() {

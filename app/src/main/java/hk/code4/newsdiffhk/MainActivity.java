@@ -14,6 +14,7 @@ import java.util.List;
 import hk.code4.newsdiffhk.Adapter.NewsAdapter;
 import hk.code4.newsdiffhk.DAO.NetworkController;
 import hk.code4.newsdiffhk.Model.News;
+import hk.code4.newsdiffhk.Model.NewsItem;
 import hk.code4.newsdiffhk.Model.Publisher;
 import hk.code4.newsdiffhk.Util.NetworkUtils;
 import hk.code4.newsdiffhk.Widget.EmptyRecyclerView;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         mAdapter = new NewsAdapter();
         mAdapter.setOnItemClickListener((view, position) -> {
-            NewsDetailActivity.start(this, mNews.getNews().get(position).getId());
+            final NewsItem item = mNews.getNews().get(position);
+            NewsDetailActivity.start(this, item.getId(), item.getTitle(), item.getCount());
         });
 
         setupRecyclerView();
