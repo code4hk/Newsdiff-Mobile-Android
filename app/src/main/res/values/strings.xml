@@ -7,4 +7,5 @@
     <string name="empty">下載中...</string>
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
+    <string name="title_activity_news_detail">NewsDetail</string>
 </resources>

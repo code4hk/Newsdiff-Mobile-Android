@@ -9,4 +9,5 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
     <color name="tab_normal_text">#B6B6B6</color>
+    <color name="change">#22aa22</color>
 </resources>

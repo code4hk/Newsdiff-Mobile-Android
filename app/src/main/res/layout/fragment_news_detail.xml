@@ -22,7 +22,8 @@
         android:layout_height="match_parent"
         android:id="@+id/scrollView"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_below="@+id/tabLayout">
+        android:layout_below="@+id/tabLayout"
+        android:layout_alignParentBottom="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,31 +35,98 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/fromBody"
+                android:id="@+id/percentage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="adsf"
-                android:visibility="gone"/>
+                android:layout_marginBottom="10dp"
+                android:gravity="end"
+                android:textAppearance="@android:style/TextAppearance.Large"
+                android:textColor="@color/accent"
+                tools:text="44.0%"/>
+
+            <TextView
+                android:id="@+id/fromTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="【拍拖遇襲】黃之鋒與女友大角嘴遇襲"/>
+
+            <TextView
+                android:id="@+id/fromPublishedAt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                tools:text="2015-1-1"/>
 
             <TextView
                 android:id="@+id/fromContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="adsfasdfasd" />
+                android:layout_marginTop="10dp"
+                tools:text="凌晨零時許，學民思潮召集人黃之鋒與女友錢詩文，在大角嘴榆樹街遭人襲擊，一名男子揮拳襲擊黃之鋒，黃被毆打至眼鏡飛脫，錢女上前制止時，亦被對方毆傷，兩人事後送院治理。" />
 
             <TextView
-                android:id="@+id/toBody"
+                android:id="@+id/fromDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="adsfasdfas"
-                android:visibility="gone" />
+                android:gravity="end"
+                android:layout_marginTop="10dp"
+                tools:text="2015-1-1"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical">
+
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="修改為"
+                    android:layout_weight="1" />
+
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
             <TextView
-                android:layout_marginTop="20dp"
+                android:id="@+id/toTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="【拍拖遇襲】黃之鋒與女友大角嘴遇襲" />
+
+            <TextView
+                android:id="@+id/toPublishedAt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                tools:text="2015-1-1"/>
+
+            <TextView
                 android:id="@+id/toContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="adsfadfasdf" />
+                android:layout_marginTop="10dp"
+                tools:text="凌晨零時許，學民思潮召集人黃之鋒與女友錢詩文" />
+
+            <TextView
+                android:id="@+id/toDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="58dp"
+                tools:text="2015-1-1"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
