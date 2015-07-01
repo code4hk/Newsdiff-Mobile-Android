@@ -1,5 +1,9 @@
 package hk.code4.newsdiffhk.Model;
 
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created by allen517 on 22/6/15.
  */
@@ -64,7 +68,7 @@ public class NewsDiff {
         return lang;
     }
 
-    class Revision {
+    public class Revision {
         DiffDetail from;
         DiffDetail to;
 
@@ -77,7 +81,7 @@ public class NewsDiff {
         }
     }
 
-    class DiffDetail {
+    public class DiffDetail {
         int version;
         String body, published_at;
         String title, content;
@@ -95,16 +99,30 @@ public class NewsDiff {
             return published_at;
         }
 
+        public String formatHTML(String replacePattern, String color, String content) {
+
+            Pattern pattern = Pattern.compile(replacePattern);
+            Matcher matcher = pattern.matcher(content);
+            int count = 0;
+            while(matcher.find()) {
+                count++;
+                System.out.println("found: " + count + " : "
+                        + matcher.start() + " - " + matcher.end());
+            }
+            return matcher.replaceAll("<font color=\""+color+"\">$1</font>");
+        }
+
         public String getTitle() {
             return title;
         }
 
         public String getContent() {
-            return content;
+            String formatted = formatHTML("<o>(.*?)<\\/o>", "red", content);
+            return formatHTML("<c>(.*?)<\\/c>", "#22aa22", formatted);
         }
 
-        public CustomDateHolder getArchiveTime() {
-            return archive_time;
+        public Date getArchiveTime() {
+            return archive_time.getDate();
         }
     }
 }
