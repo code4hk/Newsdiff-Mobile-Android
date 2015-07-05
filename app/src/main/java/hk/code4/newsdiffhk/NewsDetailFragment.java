@@ -147,7 +147,7 @@ public class NewsDetailFragment extends Fragment {
         toContent.setText(Html.fromHtml(revisions.getTo().getContent()));
         fromPublishedAt.setText(revisions.getFrom().getPublishedAt());
         toPublishedAt.setText(revisions.getTo().getPublishedAt());
-        fromDate.setText(revisions.getFrom().getPublishedAt());
-        toDate.setText(revisions.getTo().getPublishedAt());
+        fromDate.setText(revisions.getFrom().getArchiveTime().toString());
+        toDate.setText(revisions.getTo().getArchiveTime().toString());
     }
 }

@@ -12,6 +12,20 @@ public class News {
         return news;
     }
 
+    public void add(NewsItem newsItem) {
+        news.add(newsItem);
+    }
+
+    public void add(List<NewsItem> news) {
+        for (NewsItem item:news) {
+            this.news.add(item);
+        }
+    }
+
+    public void clear() {
+        news.clear();
+    }
+
     public Meta getMeta() {
         return meta;
     }

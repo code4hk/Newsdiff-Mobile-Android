@@ -19,7 +19,8 @@ import hk.code4.newsdiffhk.R;
  * Created by allen517 on 3/6/15.
  */
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
-    private News mDataset;
+//    private News mDataset;
+    private List<NewsItem> mDataset = new ArrayList<>();
     List<Publisher> mPublishers;
 
     // Provide a reference to the views for each data item
@@ -66,25 +67,20 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         this.mItemClickListener = listener;
     }
 
-    // Create new views (invoked by the activity_main manager)
     @Override
     public NewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.news_list_row, parent, false);
-//        return ViewHolder.newInstance(parent);
         return new ViewHolder(v);
     }
 
-    // Replace the contents of a view (invoked by the activity_main manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
         if (visibleObjects == null) return;
-//        if (mDataset.getNews() == null) return;
+
         NewsItem item = visibleObjects.get(position);
         if (item == null) return;
+
         holder.section_label.setText(item.getTitle());
         holder.section_create_date.setText("" + item.getCreatedAt());
         holder.section_update_date.setText("" + item.getUpdatedAt());
@@ -100,6 +96,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 //        holder.section_content.setText(item.getTitle());
     }
 
+    public NewsItem getItem(int pos){
+        try {
+            return mDataset.get(pos);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
     private List<NewsItem> visibleObjects = new ArrayList<>();
     @Override
     public int getItemCount() {
@@ -107,9 +111,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         return visibleObjects.size();
     }
 
-    public void setData(News news){
-        mDataset = news;
-        visibleObjects.addAll(mDataset.getNews());
+    public void clearData() {
+        mDataset.clear();
+    }
+
+    public void addData(List<NewsItem> news){
+        for (NewsItem item: news) {
+            mDataset.add(item);
+        }
+        visibleObjects.clear();
+        visibleObjects.addAll(mDataset);
+        notifyDataSetChanged();
     }
 
     public void setPublisher(List<Publisher> publishers) {
@@ -124,18 +136,19 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         return code;
     }
 
-    public void flushFilter(){
-        visibleObjects.addAll(mDataset.getNews());
-        notifyDataSetChanged();
-    }
-
-    public void setFilter(String publisher) {
-
-        visibleObjects.clear();
-        for (NewsItem item: mDataset.getNews()) {
-            if (item.getPublisher().equals(publisher))
-                visibleObjects.add(item);
-        }
-        notifyDataSetChanged();
-    }
+//    public void flushFilter(){
+////        visibleObjects.addAll(mDataset.getNews());
+//        visibleObjects = news;
+//        notifyDataSetChanged();
+//    }
+//
+//    public void setFilter(String publisher) {
+//
+//        visibleObjects.clear();
+//        for (NewsItem item: mDataset.getNews()) {
+//            if (item.getPublisher().equals(publisher))
+//                visibleObjects.add(item);
+//        }
+//        notifyDataSetChanged();
+//    }
 }

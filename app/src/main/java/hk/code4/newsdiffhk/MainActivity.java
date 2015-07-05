@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -28,13 +29,14 @@ public class MainActivity extends AppCompatActivity {
     NetworkController mNetworkController;
 
     List<Publisher> mPublishers;
-    News mNews;
+    News mNews = new News();
     TabLayout mTabLayout;
     NewsAdapter mAdapter;
     EmptyRecyclerView mRecyclerView;
 
     private boolean loading = true;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
+    int page = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAdapter = new NewsAdapter();
         mAdapter.setOnItemClickListener((view, position) -> {
-            final NewsItem item = mNews.getNews().get(position);
-            NewsDetailActivity.start(this, item.getId(), item.getTitle(), item.getCount());
+            final NewsItem item = mAdapter.getItem(position);
+            if (item != null)
+                NewsDetailActivity.start(this, item.getId(), item.getTitle(), item.getCount());
         });
+//        mAdapter.addData(mNews);
 
         setupRecyclerView();
 
@@ -78,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCompleted() {
                         System.out.println("Completed!");
-                        getAllNews();
+                        getAllNews(ALL_NEWS, "", page);
                     }
 
                     @Override
@@ -88,24 +92,44 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void getAllNews() {
+    final static int ALL_NEWS = 1001;
+    final static int PUBLISHER_NEWS = 1002;
+    private void getAllNews(int type, String publisher_code, int page) {
 
-        Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_NEWS_URL)))
+        Toast.makeText(this, "載入第 " + page + " 頁中", Toast.LENGTH_SHORT).show();
+        String url = "";
+        switch (type) {
+            case ALL_NEWS:
+                url = NetworkController.ALL_NEWS_URL + "?page="+page+"&sort_by=time&order=desc";
+                break;
+            case PUBLISHER_NEWS:
+                url = NetworkController.PUBLISHER_NEWS_URL + publisher_code + "/news?page="+page+"&sort_by=time&order=desc";
+                break;
+        }
+
+        if (url.length() == 0) return;
+
+        final String ourl = url;
+        Observable.defer(() -> Observable.just(mNetworkController.getJson(ourl)))
                 .map(mNetworkController::getNews)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<News>() {
                     @Override
                     public void onNext(News news) {
-                        mNews = news;
-                        mAdapter.setData(news);
-                        mAdapter.notifyDataSetChanged();
+//                        mNews = news;
+//                        mNews.clear();
+//                        mNews.add(news.getNews());
+                        mAdapter.addData(news.getNews());
                         System.out.println(news.getMeta().getCount());
+                        loading = true;
                     }
 
                     @Override
                     public void onCompleted() {
                         System.out.println("Completed!");
+                        mAdapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, "載入成功", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -122,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
+    int mCurrentTabPos = 0;
     private void setupTabLayout() {
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
@@ -129,10 +154,13 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 0)
-                    mAdapter.flushFilter();
-                else
-                    mAdapter.setFilter(mPublishers.get(tab.getPosition()-1).getCode());
+                mCurrentTabPos = tab.getPosition();
+                mAdapter.clearData();
+                page = 1;
+                if (mCurrentTabPos == 0)
+                        getAllNews(ALL_NEWS, "", page);
+                else if (mPublishers.get(tab.getPosition()-1) != null)
+                    getAllNews(PUBLISHER_NEWS, mPublishers.get(tab.getPosition()-1).getCode(), page);
             }
 
             @Override
@@ -167,6 +195,11 @@ public class MainActivity extends AppCompatActivity {
                     if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                         loading = false;
                         Log.v("...", "Last Item Wow !");
+                        page++;
+                        if (mCurrentTabPos == 0)
+                            getAllNews(ALL_NEWS, "", page);
+                        else
+                            getAllNews(PUBLISHER_NEWS, mPublishers.get(mCurrentTabPos-1).getCode(), page);
                     }
                 }
             }

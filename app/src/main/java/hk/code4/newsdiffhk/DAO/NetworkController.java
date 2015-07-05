@@ -21,6 +21,7 @@ public class NetworkController {
     News allNews = new News();
     public static final String BASE_URL = "http://newsdiff.code4.hk:12345/api";
     public static final String ALL_NEWS_URL = BASE_URL + "/news";
+    public static final String PUBLISHER_NEWS_URL = BASE_URL + "/publisher/"; //{publisher_code}/news
     public static final String ALL_PUBLISHER_URL = BASE_URL + "/publishers";
     public boolean mLoading = false;
     OkHTTPClient mHTTPClient = new OkHTTPClient();
