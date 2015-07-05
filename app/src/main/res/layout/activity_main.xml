@@ -58,6 +58,10 @@
             app:layout_collapseMode="pin"
             app:tabSelectedTextColor="@color/primary_light"
             app:tabTextColor="@color/tab_normal_text"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/primary" />
     </android.support.design.widget.AppBarLayout>
 
 </android.support.design.widget.CoordinatorLayout>
