@@ -6,10 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".NewsDiffApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".NewsDiffApplication"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
@@ -19,6 +19,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".NewsDetailActivity"
+            android:label="@string/title_activity_news_detail" >
         </activity>
     </application>
 
