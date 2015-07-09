@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="0dp"
-            app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <TextView
                 android:id="@+id/title"
@@ -62,6 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/primary" />
+
     </android.support.design.widget.AppBarLayout>
 
 </android.support.design.widget.CoordinatorLayout>
