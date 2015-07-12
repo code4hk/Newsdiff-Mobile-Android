@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
         final String ourl = url;
 
-        newsObservable
+        _subscriptions.add(newsObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Subscriber<News>() {
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Toast.makeText(MainActivity.this, "Error....", Toast.LENGTH_SHORT).show();
                 }
-            });
+            }));
     }
 
     private void setupToolbar() {
