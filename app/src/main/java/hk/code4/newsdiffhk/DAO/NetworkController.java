@@ -53,48 +53,6 @@ public class NetworkController {
         return mGson.fromJson(json, collectionType);
     }
 
-//    public void getAllNews() {
-//        GetAllNews data = new GetAllNews();
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-//            data.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ALL_NEWS_URL);
-//        else
-//            data.execute(ALL_NEWS_URL);
-//    }
-//
-//    private class GetAllNews extends AsyncTask<String, Integer, News> {
-//
-//        private OkHTTPClient mHTTPClient = new OkHTTPClient();
-//
-//        @Override
-//        protected void onPreExecute() {
-//            mLoading = true;
-//        }
-//
-//        @Override
-//        protected News doInBackground(String... param) {
-//            Thread.currentThread().setName("GetData");
-//
-//            final String result = mHTTPClient.get(param[0]);
-//
-//            try {
-//                Gson gson = new Gson();
-//                News data = gson.fromJson(result, News.class);
-//                return data;
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(News news) {
-//            super.onPostExecute(news);
-//            mLoading = false;
-//            allNews = news;
-//        }
-//    }
-
     public boolean isLoading() {
         return mLoading;
     }

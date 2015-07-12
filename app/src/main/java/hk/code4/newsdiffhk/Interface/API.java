@@ -3,9 +3,10 @@ package hk.code4.newsdiffhk.Interface;
 import java.util.List;
 
 import hk.code4.newsdiffhk.Model.News;
-import hk.code4.newsdiffhk.Model.NewsItem;
 import hk.code4.newsdiffhk.Model.Publisher;
 import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.http.Query;
 import rx.Observable;
 
 /**
@@ -13,12 +14,12 @@ import rx.Observable;
  */
 public interface API {
 
-    @GET("/news")
-    Observable<List<News>> getNews();
-
     @GET("/publishers")
     Observable<List<Publisher>> getPublisher();
 
-    @GET("/publishers/{}/news")
-    Observable<List<NewsItem>> getPublisherNews();
+    @GET("/news?sort_by=time&order=desc") // /news?page=" + page + "&sort_by=time&order=desc
+    Observable<News> getAllNews(@Query("page") int page);
+
+    @GET("/publisher/{id}/news?sort_by=time&order=desc")
+    Observable<News>  getPublisherNews(@Path("id") String id, @Query("page") int page);
 }

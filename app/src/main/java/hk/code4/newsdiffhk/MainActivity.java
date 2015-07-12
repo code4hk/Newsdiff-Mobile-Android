@@ -21,14 +21,10 @@ import hk.code4.newsdiffhk.Model.Publisher;
 import hk.code4.newsdiffhk.Util.NetworkUtils;
 import hk.code4.newsdiffhk.Util.RxUtils;
 import hk.code4.newsdiffhk.Widget.EmptyRecyclerView;
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.android.view.ViewObservable;
-import rx.android.widget.WidgetObservable;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -37,9 +33,7 @@ import static java.lang.String.format;
 public class MainActivity extends AppCompatActivity {
 
     NetworkController mNetworkController;
-
     List<Publisher> mPublishers;
-    News mNews = new News();
     TabLayout mTabLayout;
     NewsAdapter mAdapter;
     EmptyRecyclerView mRecyclerView;
@@ -66,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
             if (item != null)
                 NewsDetailActivity.start(this, item.getId(), item.getTitle(), item.getCount());
         });
-//        mAdapter.addData(mNews);
 
         setupRecyclerView();
 
@@ -120,36 +113,6 @@ public class MainActivity extends AppCompatActivity {
                            }
 
                 ));
-
-
-//        Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_PUBLISHER_URL)))
-//                .map(mNetworkController::getPublisher)
-//                .flatMap(list -> {
-//                    mPublishers = list;
-//                    mAdapter.setPublisher(list);
-//                    return Observable.from(list);
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<Publisher>() {
-//                               @Override
-//                               public void onNext(Publisher publishers) {
-//                                   mTabLayout.addTab(mTabLayout.newTab().setText(publishers.getName()));
-//                               }
-//
-//                               @Override
-//                               public void onCompleted() {
-//                                   System.out.println("Completed!");
-//                                   getAllNews(ALL_NEWS, "", page);
-//                               }
-//
-//                               @Override
-//                               public void onError(Throwable e) {
-//                                   e.printStackTrace();
-//                               }
-//                           }
-//
-//                );
     }
 
     final static int ALL_NEWS = 1001;
@@ -158,13 +121,17 @@ public class MainActivity extends AppCompatActivity {
     private void getAllNews(int type, String publisher_code, int page) {
 
         Toast.makeText(this, "載入第 " + page + " 頁中", Toast.LENGTH_SHORT).show();
+        Observable<News> newsObservable;
         String url = "";
         switch (type) {
-            case ALL_NEWS:
-                url = NetworkController.ALL_NEWS_URL + "?page=" + page + "&sort_by=time&order=desc";
-                break;
             case PUBLISHER_NEWS:
                 url = NetworkController.PUBLISHER_NEWS_URL + publisher_code + "/news?page=" + page + "&sort_by=time&order=desc";
+                newsObservable = mApi.getPublisherNews(publisher_code, page);
+                break;
+            default:
+            case ALL_NEWS:
+                url = NetworkController.ALL_NEWS_URL + "?page=" + page + "&sort_by=time&order=desc";
+                newsObservable = mApi.getAllNews(page);
                 break;
         }
 
@@ -172,36 +139,30 @@ public class MainActivity extends AppCompatActivity {
 
         final String ourl = url;
 
-//        _subscriptions.add(mApi.getNews()
-//                .map(mNetworkController::getNews)
+        newsObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<News>() {
+                @Override
+                public void onNext(News news) {
+                    mAdapter.addData(news.getNews());
+                    System.out.println(news.getMeta().getCount());
+                    loading = true;
+                }
 
-        Observable.defer(() -> Observable.just(mNetworkController.getJson(ourl)))
-                .map(mNetworkController::getNews)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<News>() {
-                    @Override
-                    public void onNext(News news) {
-//                        mNews = news;
-//                        mNews.clear();
-//                        mNews.add(news.getNews());
-                        mAdapter.addData(news.getNews());
-                        System.out.println(news.getMeta().getCount());
-                        loading = true;
-                    }
+                @Override
+                public void onCompleted() {
+                    System.out.println("Completed!");
+                    mAdapter.notifyDataSetChanged();
+                    Toast.makeText(MainActivity.this, "載入成功", Toast.LENGTH_SHORT).show();
+                }
 
-                    @Override
-                    public void onCompleted() {
-                        System.out.println("Completed!");
-                        mAdapter.notifyDataSetChanged();
-                        Toast.makeText(MainActivity.this, "載入成功", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-                });
+                @Override
+                public void onError(Throwable e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Error....", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 
     private void setupToolbar() {
@@ -277,17 +238,6 @@ public class MainActivity extends AppCompatActivity {
     private API createApi() {
 
         RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(NetworkController.BASE_URL);
-        //.setLogLevel(RestAdapter.LogLevel.FULL);
-
-//        final String githubToken = getResources().getString(R.string.github_oauth_token);
-//        if (!isNullOrEmpty(githubToken)) {
-//            builder.setRequestInterceptor(new RequestInterceptor() {
-//                @Override
-//                public void intercept(RequestFacade request) {
-//                    request.addHeader("Authorization", format("token %s", githubToken));
-//                }
-//            });
-//        }
 
         return builder.build().create(API.class);
     }

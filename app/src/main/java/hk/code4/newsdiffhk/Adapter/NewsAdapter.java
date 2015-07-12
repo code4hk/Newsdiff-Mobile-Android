@@ -113,6 +113,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 
     public void clearData() {
         mDataset.clear();
+        notifyDataSetChanged();
     }
 
     public void addData(List<NewsItem> news){
@@ -137,7 +138,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     }
 
 //    public void flushFilter(){
-////        visibleObjects.addAll(mDataset.getNews());
+////        visibleObjects.addAll(mDataset.getAllNews());
 //        visibleObjects = news;
 //        notifyDataSetChanged();
 //    }
@@ -145,7 +146,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 //    public void setFilter(String publisher) {
 //
 //        visibleObjects.clear();
-//        for (NewsItem item: mDataset.getNews()) {
+//        for (NewsItem item: mDataset.getAllNews()) {
 //            if (item.getPublisher().equals(publisher))
 //                visibleObjects.add(item);
 //        }
