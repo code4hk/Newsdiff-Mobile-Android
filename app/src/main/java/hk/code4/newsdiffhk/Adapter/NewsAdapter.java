@@ -10,7 +10,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import hk.code4.newsdiffhk.Model.News;
 import hk.code4.newsdiffhk.Model.NewsItem;
 import hk.code4.newsdiffhk.Model.Publisher;
 import hk.code4.newsdiffhk.R;
@@ -19,7 +18,7 @@ import hk.code4.newsdiffhk.R;
  * Created by allen517 on 3/6/15.
  */
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
-//    private News mDataset;
+
     private List<NewsItem> mDataset = new ArrayList<>();
     List<Publisher> mPublishers;
 
@@ -29,12 +28,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
         public TextView section_create_date, section_update_date, section_label, section_changes, section_content;
-
-//        public static ViewHolder newInstance(ViewGroup viewGroup) {
-//            return new ViewHolder(
-//                    LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.news_list_row, viewGroup, false)
-//                    );
-//        }
 
         public ViewHolder(View v) {
             super(v);
@@ -86,9 +79,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         holder.section_update_date.setText("" + item.getUpdatedAt());
         StringBuilder sb = new StringBuilder(findPublisherName(item.getPublisher()));
         sb.append(" / ");
-        sb.append("第");
         sb.append(item.getCount()-1);
-        sb.append("次修改");
+        sb.append(" 次修改");
         sb.append(" / ");
         sb.append(MessageFormat.format("{0,number,#.##%}", item.getChanges()));
         sb.append("改動");
@@ -136,20 +128,4 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         }
         return code;
     }
-
-//    public void flushFilter(){
-////        visibleObjects.addAll(mDataset.getAllNews());
-//        visibleObjects = news;
-//        notifyDataSetChanged();
-//    }
-//
-//    public void setFilter(String publisher) {
-//
-//        visibleObjects.clear();
-//        for (NewsItem item: mDataset.getAllNews()) {
-//            if (item.getPublisher().equals(publisher))
-//                visibleObjects.add(item);
-//        }
-//        notifyDataSetChanged();
-//    }
 }
