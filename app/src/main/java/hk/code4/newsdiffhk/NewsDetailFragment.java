@@ -13,11 +13,14 @@ import android.widget.TextView;
 import java.text.MessageFormat;
 
 import hk.code4.newsdiffhk.DAO.NetworkController;
+import hk.code4.newsdiffhk.Interface.API;
 import hk.code4.newsdiffhk.Model.NewsDiff;
-import rx.Observable;
+import hk.code4.newsdiffhk.Util.RxUtils;
+import retrofit.RestAdapter;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -28,6 +31,8 @@ public class NewsDetailFragment extends Fragment {
     TextView emptyText, title, fromTitle, fromContent, toTitle, toContent, percentage, fromDate, toDate, fromPublishedAt, toPublishedAt;
 //    ProgressBar progress;
     TabLayout mTabLayout;
+    private CompositeSubscription _subscriptions = new CompositeSubscription();
+    private API mApi;
 
     public NewsDetailFragment() {
     }
@@ -63,6 +68,8 @@ public class NewsDetailFragment extends Fragment {
         fromPublishedAt = (TextView) view.findViewById(R.id.fromPublishedAt);
         toPublishedAt = (TextView) view.findViewById(R.id.toPublishedAt);
 
+        mApi = createApi();
+
         if (null != arguments)
             getDetail(arguments.getString(NewsDetailActivity.EXTRA_ITEM_ID), arguments.getInt(NewsDetailActivity.EXTRA_ITEM_REVISION));
 
@@ -72,38 +79,48 @@ public class NewsDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        _subscriptions = RxUtils.getNewCompositeSubIfUnsubscribed(_subscriptions);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        RxUtils.unsubscribeIfNotNull(_subscriptions);
+    }
+
     SparseArray<NewsDiff> revision = new SparseArray<NewsDiff>();
     private void getDetail(String oid, int total_count) {
 
         mNetworkController = NetworkController.getInstance();
 
-
-        for (int x = total_count; x >= 0 ; x--) {
+        for (int x = total_count; x > 1 ; x--) {
             int y = x-1;
             int z = y-1;
 
-            Observable.defer(() -> Observable.just(mNetworkController.getJson(NetworkController.ALL_NEWS_URL + "/" + oid + "/?from_revision="+z+"&to_revision=" + y )))
-                    .map(mNetworkController::getNewsDiff)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<NewsDiff>() {
-                        @Override
-                        public void onNext(NewsDiff newsDiff) {
-                            revision.put(y, newsDiff);
-                            if (y == total_count - 1) setUI(newsDiff);
-                            setProgressBarVisibility(View.GONE);
-                        }
+            _subscriptions.add(mApi.getNewsDetail(oid, z, y)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<NewsDiff>() {
+                    @Override
+                    public void onNext(NewsDiff newsDiff) {
+                        revision.put(y, newsDiff);
+                        if (y == total_count - 1) setUI(newsDiff);
+                        setProgressBarVisibility(View.GONE);
+                    }
 
-                        @Override
-                        public void onCompleted() {
-                            System.out.println("Completed!");
-                        }
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("Completed!");
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+                }));
         }
     }
 
@@ -149,5 +166,12 @@ public class NewsDetailFragment extends Fragment {
         toPublishedAt.setText(revisions.getTo().getPublishedAt());
         fromDate.setText(revisions.getFrom().getArchiveTime().toString());
         toDate.setText(revisions.getTo().getArchiveTime().toString());
+    }
+
+    private API createApi() {
+
+        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(NetworkController.BASE_URL);
+
+        return builder.build().create(API.class);
     }
 }
