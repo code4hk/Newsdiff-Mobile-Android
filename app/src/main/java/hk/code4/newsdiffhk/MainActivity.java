@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     List<Publisher> mPublishers;
     TabLayout mTabLayout;
     NewsAdapter mAdapter;
+    TextView mEmptyText;
     EmptyRecyclerView mRecyclerView;
     private CompositeSubscription _subscriptions = new CompositeSubscription();
     private API mApi;
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupRecyclerView();
 
+        mEmptyText = (TextView) findViewById(R.id.emptyText);
 
         mApi = createApi();
 
@@ -120,49 +123,43 @@ public class MainActivity extends AppCompatActivity {
 
     private void getAllNews(int type, String publisher_code, int page) {
 
-        Toast.makeText(this, "載入第 " + page + " 頁中", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, format(getString(R.string.loading_page), page), Toast.LENGTH_SHORT).show();
         Observable<News> newsObservable;
-        String url = "";
+
         switch (type) {
             case PUBLISHER_NEWS:
-                url = NetworkController.PUBLISHER_NEWS_URL + publisher_code + "/news?page=" + page + "&sort_by=time&order=desc";
                 newsObservable = mApi.getPublisherNews(publisher_code, page);
                 break;
             default:
             case ALL_NEWS:
-                url = NetworkController.ALL_NEWS_URL + "?page=" + page + "&sort_by=time&order=desc";
                 newsObservable = mApi.getAllNews(page);
                 break;
         }
 
-        if (url.length() == 0) return;
-
-        final String ourl = url;
-
         _subscriptions.add(newsObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<News>() {
-                @Override
-                public void onNext(News news) {
-                    mAdapter.addData(news.getNews());
-                    System.out.println(news.getMeta().getCount());
-                    loading = true;
-                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<News>() {
+                    @Override
+                    public void onNext(News news) {
+                        mAdapter.addData(news.getNews());
+                        System.out.println(news.getMeta().getCount());
+                        loading = true;
+                    }
 
-                @Override
-                public void onCompleted() {
-                    System.out.println("Completed!");
-                    mAdapter.notifyDataSetChanged();
-                    Toast.makeText(MainActivity.this, "載入成功", Toast.LENGTH_SHORT).show();
-                }
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("Completed!");
+                        mAdapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, R.string.connection_success, Toast.LENGTH_SHORT).show();
+                    }
 
-                @Override
-                public void onError(Throwable e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "Error....", Toast.LENGTH_SHORT).show();
-                }
-            }));
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        mEmptyText.setText(R.string.connection_fail);
+                    }
+                }));
     }
 
     private void setupToolbar() {

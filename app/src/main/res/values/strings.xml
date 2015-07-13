@@ -8,4 +8,7 @@
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="title_activity_news_detail">NewsDetail</string>
+    <string name="connection_fail">連接伺服器失敗</string>
+    <string name="connection_success">載入成功</string>
+    <string name="loading_page">載入第 %d 頁中</string>
 </resources>
