@@ -11,4 +11,6 @@
     <string name="connection_fail">連接伺服器失敗</string>
     <string name="connection_success">載入成功</string>
     <string name="loading_page">載入第 %d 頁中</string>
+    <string name="secret_mode">登登登凳!!!</string>
+    <string name="prod_mode">噢......</string>
 </resources>
