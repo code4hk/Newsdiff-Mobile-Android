@@ -13,12 +13,14 @@ public class NewsDetailActivity extends AppCompatActivity {
     public static final String EXTRA_ITEM_ID = "oid";
     public static final String EXTRA_ITEM_TITLE = "title";
     public static final String EXTRA_ITEM_REVISION = "total_revision";
+    public static final String EXTRA_ITEM_IS_SECRET_MODE = "secret_mode";
 
-    public static void start(Context context, String oid, String title, int total_revision) {
+    public static void start(Context context, String oid, String title, int total_revision, boolean secret_mode) {
         Intent launchIntent = new Intent(context, NewsDetailActivity.class);
         launchIntent.putExtra(EXTRA_ITEM_ID, oid);
         launchIntent.putExtra(EXTRA_ITEM_TITLE, title);
         launchIntent.putExtra(EXTRA_ITEM_REVISION, total_revision);
+        launchIntent.putExtra(EXTRA_ITEM_IS_SECRET_MODE, secret_mode);
 
         context.startActivity(launchIntent);
     }
@@ -35,7 +37,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         title.setText(bundle.getString(EXTRA_ITEM_TITLE));
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, NewsDetailFragment.newInstance(bundle.getString(EXTRA_ITEM_ID), bundle.getInt(EXTRA_ITEM_REVISION)))
+                .replace(R.id.container, NewsDetailFragment.newInstance(bundle.getString(EXTRA_ITEM_ID), bundle.getInt(EXTRA_ITEM_REVISION), bundle.getBoolean(EXTRA_ITEM_IS_SECRET_MODE)))
                 .commit();
     }
 

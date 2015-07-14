@@ -11,10 +11,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
 
 import hk.code4.newsdiffhk.DAO.NetworkController;
 import hk.code4.newsdiffhk.Interface.API;
 import hk.code4.newsdiffhk.Model.NewsDiff;
+import hk.code4.newsdiffhk.Util.DiffMatchPatch;
 import hk.code4.newsdiffhk.Util.RxUtils;
 import retrofit.RestAdapter;
 import rx.Subscriber;
@@ -28,19 +30,21 @@ import rx.subscriptions.CompositeSubscription;
 public class NewsDetailFragment extends Fragment {
 
     NetworkController mNetworkController;
-    TextView emptyText, title, fromTitle, fromContent, toTitle, toContent, percentage, fromDate, toDate, fromPublishedAt, toPublishedAt;
-//    ProgressBar progress;
+    TextView toTitle, toContent, percentage, toDate, toPublishedAt;
     TabLayout mTabLayout;
     private CompositeSubscription _subscriptions = new CompositeSubscription();
     private API mApi;
+    private DiffMatchPatch diff = new DiffMatchPatch();
+    private boolean secret_mode;
 
     public NewsDetailFragment() {
     }
 
-    public static NewsDetailFragment newInstance(String oid, int total_revision) {
+    public static NewsDetailFragment newInstance(String oid, int total_revision, boolean secret_mode) {
         Bundle bundle = new Bundle();
         bundle.putString(NewsDetailActivity.EXTRA_ITEM_ID, oid);
         bundle.putInt(NewsDetailActivity.EXTRA_ITEM_REVISION, total_revision);
+        bundle.putBoolean(NewsDetailActivity.EXTRA_ITEM_IS_SECRET_MODE, secret_mode);
 
         NewsDetailFragment fragment = new NewsDetailFragment();
         fragment.setArguments(bundle);
@@ -51,7 +55,7 @@ public class NewsDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_news_detail, container, false);
+        return inflater.inflate(R.layout.fragment_news_detail_single, container, false);
     }
 
     @Override
@@ -59,13 +63,9 @@ public class NewsDetailFragment extends Fragment {
         final Bundle arguments = getArguments();
 
         percentage = (TextView) view.findViewById(R.id.percentage);
-        fromTitle = (TextView) view.findViewById(R.id.fromTitle);
-        fromContent = (TextView) view.findViewById(R.id.fromContent);
         toTitle = (TextView) view.findViewById(R.id.toTitle);
         toContent = (TextView) view.findViewById(R.id.toContent);
-        fromDate = (TextView) view.findViewById(R.id.fromDate);
         toDate = (TextView) view.findViewById(R.id.toDate);
-        fromPublishedAt = (TextView) view.findViewById(R.id.fromPublishedAt);
         toPublishedAt = (TextView) view.findViewById(R.id.toPublishedAt);
 
         mApi = createApi();
@@ -73,8 +73,9 @@ public class NewsDetailFragment extends Fragment {
         if (null != arguments)
             getDetail(arguments.getString(NewsDetailActivity.EXTRA_ITEM_ID), arguments.getInt(NewsDetailActivity.EXTRA_ITEM_REVISION));
 
-//        emptyText = (TextView) view.findViewById(R.id.emptyText);
         setupTabLayout(view, arguments.getInt(NewsDetailActivity.EXTRA_ITEM_REVISION));
+
+        secret_mode = arguments.getBoolean(NewsDetailActivity.EXTRA_ITEM_IS_SECRET_MODE);
 
         super.onViewCreated(view, savedInstanceState);
     }
@@ -156,16 +157,60 @@ public class NewsDetailFragment extends Fragment {
     }
 
     private void setUI(NewsDiff newsDiff) {
-        percentage.setText("修改比例： "+MessageFormat.format("{0,number,#.##%}", newsDiff.getChanges()));
         final NewsDiff.Revision revisions = newsDiff.getRevisions();
-        fromTitle.setText(revisions.getFrom().getTitle());
-        fromContent.setText(Html.fromHtml(revisions.getFrom().getContent()));
-        toTitle.setText(revisions.getTo().getTitle());
-        toContent.setText(Html.fromHtml(revisions.getTo().getContent()));
-        fromPublishedAt.setText(revisions.getFrom().getPublishedAt());
+        LinkedList<DiffMatchPatch.Diff> diffs_title = diff.diff_main(revisions.getFrom().getTitle(), revisions.getTo().getTitle());
+        LinkedList<DiffMatchPatch.Diff> diffs_content = diff.diff_main(revisions.getFrom().getBody(), revisions.getTo().getBody());
+
+        percentage.setText("修改比例： "+MessageFormat.format("{0,number,#.##%}", newsDiff.getChanges()));
+        toTitle.setText(Html.fromHtml(prettyHtml(diffs_title, true)));
+        toContent.setText(Html.fromHtml(prettyHtml(diffs_content, false)));
         toPublishedAt.setText(revisions.getTo().getPublishedAt());
-        fromDate.setText(revisions.getFrom().getArchiveTime().toString());
         toDate.setText(revisions.getTo().getArchiveTime().toString());
+    }
+
+    /**
+     * Convert a Diff list into a pretty HTML report.
+     * @param diffs LinkedList of Diff objects.
+     * @return HTML representation.
+     */
+    public String prettyHtml(LinkedList<DiffMatchPatch.Diff> diffs, boolean isNoMask) {
+
+        if (secret_mode) isNoMask = true;
+
+        StringBuilder html = new StringBuilder();
+        for (DiffMatchPatch.Diff aDiff : diffs) {
+            String text = aDiff.text.replace("&", "&amp;").replace("<", "&lt;")
+                    .replace(">", "&gt;").replace("\n", "&para;<br>");
+            switch (aDiff.operation) {
+                case INSERT:
+                    html.append("<font color=\"#4169e1\">").append(text)
+                            .append("</font>");
+                    break;
+                case DELETE:
+                    html.append("<font color=\"#dc143c\">").append(text)
+                            .append("</font>");
+                    break;
+                case EQUAL:
+//                    html.append("<div>").append(text).append("</div>");
+                    final int len = text.length();
+                    String[] stringArray = text.split("");
+                    for (int x = 0; x < len ; x ++) {
+                        if ((stringArray[x].equals("，")
+                                || stringArray[x].equals("。")
+                                || stringArray[x].equals("「")
+                                || stringArray[x].equals("」")))
+                            html.append(stringArray[x]);
+                        else {
+                            if (isNoMask)
+                                html.append(stringArray[x]);
+                            else
+                                html.append('〇 ');
+                        }
+                    }
+                    break;
+            }
+        }
+        return html.toString();
     }
 
     private API createApi() {

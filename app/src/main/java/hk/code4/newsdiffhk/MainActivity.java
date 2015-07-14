@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,14 +34,16 @@ import static java.lang.String.format;
 
 public class MainActivity extends AppCompatActivity {
 
-    NetworkController mNetworkController;
-    List<Publisher> mPublishers;
-    TabLayout mTabLayout;
-    NewsAdapter mAdapter;
-    TextView mEmptyText;
-    EmptyRecyclerView mRecyclerView;
+    private NetworkController mNetworkController;
+    private List<Publisher> mPublishers;
+    private TabLayout mTabLayout;
+    private NewsAdapter mAdapter;
+    private TextView mEmptyText;
+    private EmptyRecyclerView mRecyclerView;
     private CompositeSubscription _subscriptions = new CompositeSubscription();
     private API mApi;
+    public static boolean isSecretMode = false;
+    private int secretModeCount = 0;
 
     private boolean loading = true;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListener((view, position) -> {
             final NewsItem item = mAdapter.getItem(position);
             if (item != null)
-                NewsDetailActivity.start(this, item.getId(), item.getTitle(), item.getCount());
+                NewsDetailActivity.start(this, item.getId(), item.getTitle(), item.getCount(), isSecretMode);
         });
 
         setupRecyclerView();
@@ -167,6 +170,19 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setOnClickListener((view) -> {
+                secretModeCount++;
+                if (!isSecretMode && secretModeCount > 10) {
+                    isSecretMode = true;
+                    secretModeCount = 0;
+                    Toast.makeText(this, getString(R.string.secret_mode), Toast.LENGTH_SHORT).show();
+                } else if (secretModeCount > 10) {
+                    isSecretMode = false;
+                    secretModeCount = 0;
+                    Toast.makeText(this, getString(R.string.prod_mode), Toast.LENGTH_SHORT).show();
+                }
+            }
+        );
     }
 
     int mCurrentTabPos = 0;
