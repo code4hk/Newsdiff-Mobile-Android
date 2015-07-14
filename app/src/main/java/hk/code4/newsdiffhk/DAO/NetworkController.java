@@ -20,12 +20,12 @@ import hk.code4.newsdiffhk.Util.OkHTTPClient;
 public class NetworkController {
     News allNews = new News();
     public static final String BASE_URL = "http://newsdiff.code4.hk:12345/api";
-    public static final String ALL_NEWS_URL = BASE_URL + "/news";
-    public static final String PUBLISHER_NEWS_URL = BASE_URL + "/publisher/"; //{publisher_code}/news
-    public static final String ALL_PUBLISHER_URL = BASE_URL + "/publishers";
+//    public static final String ALL_NEWS_URL = BASE_URL + "/news";
+//    public static final String PUBLISHER_NEWS_URL = BASE_URL + "/publisher/"; //{publisher_code}/news
+//    public static final String ALL_PUBLISHER_URL = BASE_URL + "/publishers";
     public boolean mLoading = false;
-    OkHTTPClient mHTTPClient = new OkHTTPClient();
-    Gson mGson = new Gson();
+//    OkHTTPClient mHTTPClient = new OkHTTPClient();
+//    Gson mGson = new Gson();
 
     private static NetworkController ourInstance = new NetworkController();
 
@@ -36,22 +36,22 @@ public class NetworkController {
     private NetworkController() {
     }
 
-    public String getJson(String url) {
-        return mHTTPClient.get(url);
-    }
-
-    public News getNews(String json) {
-        return mGson.fromJson(json, News.class);
-    }
-
-    public NewsDiff getNewsDiff(String json) {
-        return mGson.fromJson(json, NewsDiff.class);
-    }
-
-    public List<Publisher> getPublisher(String json) {
-        Type collectionType = new TypeToken<List<Publisher>>(){}.getType();
-        return mGson.fromJson(json, collectionType);
-    }
+//    public String getJson(String url) {
+//        return mHTTPClient.get(url);
+//    }
+//
+//    public News getNews(String json) {
+//        return mGson.fromJson(json, News.class);
+//    }
+//
+//    public NewsDiff getNewsDiff(String json) {
+//        return mGson.fromJson(json, NewsDiff.class);
+//    }
+//
+//    public List<Publisher> getPublisher(String json) {
+//        Type collectionType = new TypeToken<List<Publisher>>(){}.getType();
+//        return mGson.fromJson(json, collectionType);
+//    }
 
     public boolean isLoading() {
         return mLoading;
