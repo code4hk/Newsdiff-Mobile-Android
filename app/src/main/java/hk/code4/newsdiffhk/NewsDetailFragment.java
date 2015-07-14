@@ -204,7 +204,7 @@ public class NewsDetailFragment extends Fragment {
                             if (isNoMask)
                                 html.append(stringArray[x]);
                             else
-                                html.append('〇 ');
+                                html.append('〇');
                         }
                     }
                     break;
