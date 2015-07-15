@@ -192,17 +192,16 @@ public class NewsDetailFragment extends Fragment {
                     break;
                 case EQUAL:
 //                    html.append("<div>").append(text).append("</div>");
-                    final int len = text.length();
                     String[] stringArray = text.split("");
-                    for (int x = 0; x < len ; x ++) {
-                        if ((stringArray[x].equals("，")
-                                || stringArray[x].equals("。")
-                                || stringArray[x].equals("「")
-                                || stringArray[x].equals("」")))
-                            html.append(stringArray[x]);
+                    for (CharSequence character : stringArray) {
+                        if ((character.equals("，")
+                                || character.equals("。")
+                                || character.equals("「")
+                                || character.equals("」")))
+                            html.append(character);
                         else {
                             if (isNoMask)
-                                html.append(stringArray[x]);
+                                html.append(character);
                             else
                                 html.append('〇');
                         }
