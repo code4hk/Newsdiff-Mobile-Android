@@ -8,6 +8,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:focusable="true"
     android:clickable="true"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
     <TextView
