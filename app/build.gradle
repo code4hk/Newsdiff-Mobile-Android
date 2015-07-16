@@ -9,18 +9,34 @@ android {
         applicationId "hk.code4.newsdiffhk"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+        versionCode 201507150
+        versionName "0.1"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+//            signingConfig signingConfigs.release
+            minifyEnabled false
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        applicationVariants.all { variant ->
+            variant.outputs.each { output ->
+                if (variant.buildType.name.equals("debug")) {
+                    output.outputFile = file("$project.rootDir/apk/newsdiffhk_debug_v${defaultConfig.versionName}.apk")
+                } else if (variant.buildType.name.equals("release")) {
+                    output.outputFile = file("$project.rootDir/apk/newsdiffhk_v${defaultConfig.versionName}.apk")
+                }
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -30,16 +46,9 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:recyclerview-v7:22.2.0'
     compile 'com.android.support:support-v4:22.2.0'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
-    //    provided 'de.greenrobot:eventbus-annotation-processor:3.0.0-beta1'
-    compile 'de.greenrobot:eventbus:3.0.0-beta1'
-    compile 'com.facebook.stetho:stetho:1.1.1'
     compile 'io.reactivex:rxandroid:0.24.0'
-    compile 'com.facebook.stetho:stetho-okhttp:1.1.1'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'org.robolectric:robolectric:3.0-rc3'
