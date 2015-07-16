@@ -7,6 +7,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import hk.code4.newsdiffhk.BuildConfig;
+import hk.code4.newsdiffhk.Constance;
 import hk.code4.newsdiffhk.Model.News;
 
 import static org.junit.Assert.assertEquals;
@@ -18,12 +19,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class TestDataManager {
-    NetworkController mNetworkController;
+    Constance mNetworkController;
     News news;
 
     @Before
     public void setUp() throws Exception {
-        mNetworkController = NetworkController.getInstance();
+        mNetworkController = Constance.getInstance();
 //        mNetworkController.getAllNews();
     }
 

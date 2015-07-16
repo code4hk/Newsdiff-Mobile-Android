@@ -8,15 +8,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
 
 import hk.code4.newsdiffhk.Adapter.NewsAdapter;
-import hk.code4.newsdiffhk.DAO.NetworkController;
-import hk.code4.newsdiffhk.Interface.API;
+import hk.code4.newsdiffhk.Interface.Api;
 import hk.code4.newsdiffhk.Model.News;
 import hk.code4.newsdiffhk.Model.NewsItem;
 import hk.code4.newsdiffhk.Model.Publisher;
@@ -34,14 +32,14 @@ import static java.lang.String.format;
 
 public class MainActivity extends AppCompatActivity {
 
-    private NetworkController mNetworkController;
+    private Constance mNetworkController;
     private List<Publisher> mPublishers;
     private TabLayout mTabLayout;
     private NewsAdapter mAdapter;
     private TextView mEmptyText;
     private EmptyRecyclerView mRecyclerView;
     private CompositeSubscription _subscriptions = new CompositeSubscription();
-    private API mApi;
+    private Api mApi;
     public static boolean isSecretMode = false;
     private int secretModeCount = 0;
 
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setupToolbar();
         setupTabLayout();
 
-        mNetworkController = NetworkController.getInstance();
+        mNetworkController = Constance.getInstance();
 
         mAdapter = new NewsAdapter();
         mAdapter.setOnItemClickListener((view, position) -> {
@@ -248,10 +246,10 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setEmptyView(findViewById(R.id.emptyText));
     }
 
-    private API createApi() {
+    private Api createApi() {
 
-        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(NetworkController.BASE_URL);
+        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(Constance.BASE_URL);
 
-        return builder.build().create(API.class);
+        return builder.build().create(Api.class);
     }
 }

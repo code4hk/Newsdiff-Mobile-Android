@@ -13,8 +13,7 @@ import android.widget.TextView;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 
-import hk.code4.newsdiffhk.DAO.NetworkController;
-import hk.code4.newsdiffhk.Interface.API;
+import hk.code4.newsdiffhk.Interface.Api;
 import hk.code4.newsdiffhk.Model.NewsDiff;
 import hk.code4.newsdiffhk.Util.DiffMatchPatch;
 import hk.code4.newsdiffhk.Util.RxUtils;
@@ -29,11 +28,11 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class NewsDetailFragment extends Fragment {
 
-    NetworkController mNetworkController;
+    Constance mNetworkController;
     TextView toTitle, toContent, percentage, toDate, toPublishedAt;
     TabLayout mTabLayout;
     private CompositeSubscription _subscriptions = new CompositeSubscription();
-    private API mApi;
+    private Api mApi;
     private DiffMatchPatch diff = new DiffMatchPatch();
     private boolean secret_mode;
 
@@ -95,7 +94,7 @@ public class NewsDetailFragment extends Fragment {
     SparseArray<NewsDiff> revision = new SparseArray<NewsDiff>();
     private void getDetail(String oid, int total_count) {
 
-        mNetworkController = NetworkController.getInstance();
+        mNetworkController = Constance.getInstance();
 
         for (int x = total_count; x > 1 ; x--) {
             int y = x-1;
@@ -212,10 +211,10 @@ public class NewsDetailFragment extends Fragment {
         return html.toString();
     }
 
-    private API createApi() {
+    private Api createApi() {
 
-        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(NetworkController.BASE_URL);
+        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(Constance.BASE_URL);
 
-        return builder.build().create(API.class);
+        return builder.build().create(Api.class);
     }
 }
