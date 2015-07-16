@@ -92,15 +92,6 @@ public class NewsDetailFragment extends Fragment {
             toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
             toolbar.setNavigationOnClickListener((v)->getActivity().finish());
 
-            final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-            upArrow.setColorFilter(getResources().getColor(R.color.blackText), PorterDuff.Mode.SRC_ATOP);
-            getSupportActionBar().setHomeAsUpIndicator(upArrow);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-            mActionBar.setNavigationIcon(upArrow);
-
-            mActionBar.setNavigationIcon(getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha));
-
             // Inflate a menu to be displayed in the toolbar
 //            toolbar.inflateMenu(R.menu.settings);
         }
