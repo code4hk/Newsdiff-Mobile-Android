@@ -32,7 +32,6 @@ import static java.lang.String.format;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Constance mNetworkController;
     private List<Publisher> mPublishers;
     private TabLayout mTabLayout;
     private NewsAdapter mAdapter;
@@ -55,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
         setupToolbar();
         setupTabLayout();
 
-        mNetworkController = Constance.getInstance();
-
         mAdapter = new NewsAdapter();
         mAdapter.setOnItemClickListener((view, position) -> {
             final NewsItem item = mAdapter.getItem(position);
@@ -68,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         mEmptyText = (TextView) findViewById(R.id.emptyText);
 
-        mApi = createApi();
+        mApi = NetworkUtils.createApi();
 
         if (NetworkUtils.isOnline(MainActivity.this))
             getAllPublisher();
@@ -244,12 +241,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mRecyclerView.setEmptyView(findViewById(R.id.emptyText));
-    }
-
-    private Api createApi() {
-
-        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(Constance.BASE_URL);
-
-        return builder.build().create(Api.class);
     }
 }

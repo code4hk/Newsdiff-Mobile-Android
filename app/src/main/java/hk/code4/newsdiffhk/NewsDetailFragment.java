@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import hk.code4.newsdiffhk.Interface.Api;
 import hk.code4.newsdiffhk.Model.NewsDiff;
 import hk.code4.newsdiffhk.Util.DiffMatchPatch;
+import hk.code4.newsdiffhk.Util.NetworkUtils;
 import hk.code4.newsdiffhk.Util.RxUtils;
 import retrofit.RestAdapter;
 import rx.Subscriber;
@@ -28,7 +29,6 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class NewsDetailFragment extends Fragment {
 
-    Constance mNetworkController;
     TextView toTitle, toContent, percentage, toDate, toPublishedAt;
     TabLayout mTabLayout;
     private CompositeSubscription _subscriptions = new CompositeSubscription();
@@ -67,7 +67,7 @@ public class NewsDetailFragment extends Fragment {
         toDate = (TextView) view.findViewById(R.id.toDate);
         toPublishedAt = (TextView) view.findViewById(R.id.toPublishedAt);
 
-        mApi = createApi();
+        mApi = NetworkUtils.createApi();
 
         if (null != arguments)
             getDetail(arguments.getString(NewsDetailActivity.EXTRA_ITEM_ID), arguments.getInt(NewsDetailActivity.EXTRA_ITEM_REVISION));
@@ -93,8 +93,6 @@ public class NewsDetailFragment extends Fragment {
 
     SparseArray<NewsDiff> revision = new SparseArray<NewsDiff>();
     private void getDetail(String oid, int total_count) {
-
-        mNetworkController = Constance.getInstance();
 
         for (int x = total_count; x > 1 ; x--) {
             int y = x-1;
@@ -209,12 +207,5 @@ public class NewsDetailFragment extends Fragment {
             }
         }
         return html.toString();
-    }
-
-    private Api createApi() {
-
-        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint(Constance.BASE_URL);
-
-        return builder.build().create(Api.class);
     }
 }
