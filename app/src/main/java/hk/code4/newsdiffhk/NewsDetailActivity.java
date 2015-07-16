@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class NewsDetailActivity extends AppCompatActivity {
 
@@ -33,14 +35,13 @@ public class NewsDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        TextView title = (TextView) findViewById(R.id.title);
-        title.setText(bundle.getString(EXTRA_ITEM_TITLE));
-
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, NewsDetailFragment.newInstance(bundle.getString(EXTRA_ITEM_ID), bundle.getInt(EXTRA_ITEM_REVISION), bundle.getBoolean(EXTRA_ITEM_IS_SECRET_MODE)))
+                .replace(R.id.container,
+                        NewsDetailFragment.newInstance(bundle.getString(EXTRA_ITEM_ID)
+                                ,bundle.getString(EXTRA_ITEM_TITLE), bundle.getInt(EXTRA_ITEM_REVISION)
+                                , bundle.getBoolean(EXTRA_ITEM_IS_SECRET_MODE)))
                 .commit();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

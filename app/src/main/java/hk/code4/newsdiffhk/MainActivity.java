@@ -21,7 +21,6 @@ import hk.code4.newsdiffhk.Model.Publisher;
 import hk.code4.newsdiffhk.Util.NetworkUtils;
 import hk.code4.newsdiffhk.Util.RxUtils;
 import hk.code4.newsdiffhk.Widget.EmptyRecyclerView;
-import retrofit.RestAdapter;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -165,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         toolbar.setOnClickListener((view) -> {
                 secretModeCount++;
                 if (!isSecretMode && secretModeCount > 10) {
